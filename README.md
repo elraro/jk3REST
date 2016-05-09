@@ -4,7 +4,7 @@ API REST for query JK3 servers(based on Quake 3 protocol).
 
 ## Build Status
 
-[![Build Status](https://travis-ci.org/elraro/jk3REST.svg?branch=master)]
+[(https://travis-ci.org/elraro/jk3REST.svg?branch=master)]
 
 ## License
 
