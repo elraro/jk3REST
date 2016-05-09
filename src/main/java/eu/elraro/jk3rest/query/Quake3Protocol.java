@@ -46,23 +46,23 @@ public class Quake3Protocol {
 			if (port != null)
 				this.port = port;
 			if (port < 0 || port > 65536)
-				return responseStatus = ServerResponseStatus.ILLEGAL_ARGUMENT_EXCEPTION;
+				return this.responseStatus = ServerResponseStatus.ILLEGAL_ARGUMENT_EXCEPTION;
 		} catch (UnknownHostException e) {
-			return responseStatus = ServerResponseStatus.UNKNOWN_HOST_EXCEPTION;
+			return this.responseStatus = ServerResponseStatus.UNKNOWN_HOST_EXCEPTION;
 		}
 
 		try {
-			socket = new DatagramSocket();
-			socket.setSoTimeout(timeout);
+			this.socket = new DatagramSocket();
+			this.socket.setSoTimeout(timeout);
 		} catch (SocketException e) {
-			return responseStatus = ServerResponseStatus.SOCKET_EXCEPTION;
+			return this.responseStatus = ServerResponseStatus.SOCKET_EXCEPTION;
 		}
-		return responseStatus = ServerResponseStatus.CONNECTED;
+		return this.responseStatus = ServerResponseStatus.CONNECTED;
 	}
 
 	public void disconnect() {
-		if (socket != null) {
-			socket.disconnect();
+		if (this.socket != null) {
+			this.socket.disconnect();
 		}
 	}
 
@@ -78,30 +78,30 @@ public class Quake3Protocol {
 				buffer[i] = tmp[i - offset];
 		}
 
-		packet = new DatagramPacket(buffer, buffer.length, getIpAddress(), port);
+		this.packet = new DatagramPacket(buffer, buffer.length, getIpAddress(), this.port);
 		try {
-			time = System.currentTimeMillis();
-			socket.send(packet);
+			this.time = System.currentTimeMillis();
+			this.socket.send(this.packet);
 		} catch (IOException e) {
-			return responseStatus = ServerResponseStatus.IO_EXCEPTION;
+			return this.responseStatus = ServerResponseStatus.IO_EXCEPTION;
 		}
 
-		response = getResponse();
+		this.response = getResponse();
 		return getResponseStatus();
 	}
 
 	private String getResponse() {
 		byte[] response = new byte[65507];
-		packet = new DatagramPacket(response, response.length);
+		this.packet = new DatagramPacket(response, response.length);
 		try {
-			socket.receive(packet);
-			deltaTime = System.currentTimeMillis() - time;
-			responseStatus = ServerResponseStatus.OK;
+			this.socket.receive(packet);
+			this.deltaTime = System.currentTimeMillis() - this.time;
+			this.responseStatus = ServerResponseStatus.OK;
 		} catch (SocketTimeoutException e) {
-			responseStatus = ServerResponseStatus.SOCKET_TIMEOUT_EXCEPTION;
+			this.responseStatus = ServerResponseStatus.SOCKET_TIMEOUT_EXCEPTION;
 			return null;
 		} catch (IOException e) {
-			responseStatus = ServerResponseStatus.IO_EXCEPTION;
+			this.responseStatus = ServerResponseStatus.IO_EXCEPTION;
 			return null;
 		}
 
@@ -109,17 +109,17 @@ public class Quake3Protocol {
 	}
 
 	public ServerResponseStatus getResponseStatus() {
-		return responseStatus;
+		return this.responseStatus;
 	}
 
 	public void updateServerInfo(GameServer server) {
-		if (response == null || response.contains("disconnect")) {
+		if (this.response == null || this.response.contains("disconnect")) {
 			server.setOnline(false);
 			return;
 		}
 
 		server.setPlayers(new ArrayList<Player>());
-		String[] lines = response.split("\\n");
+		String[] lines = this.response.split("\\n");
 
 		//System.out.println(lines[1]);
 
@@ -128,7 +128,7 @@ public class Quake3Protocol {
 		while (tokens.hasMoreTokens()) {
 			String key = tokens.nextToken();
 			String value = tokens.nextToken();
-			parameters.put(key, value);
+			this.parameters.put(key, value);
 		}
 
 		// players
@@ -143,23 +143,23 @@ public class Quake3Protocol {
 	}
 
 	private void updateParameters(GameServer server) {
-		server.setParameters(parameters);
+		server.setParameters(this.parameters);
 
 		server.setOnline(true);
 		server.setIpAddress(getIpAddress().getHostAddress());
-		server.setPort(port);
-		server.setPing((int) deltaTime);
+		server.setPort(this.port);
+		server.setPing((int) this.deltaTime);
 
-		server.setColoredHostName(Normalizer.normalize(parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
+		server.setColoredHostName(Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
 		server.setHostName(Normalizer.normalize(Utilities.removeColorCode(server.getColoredHostName()), Normalizer.Form.NFC).replace("\uFFFD", ""));
-		server.setMapName(parameters.get("mapname"));
-		server.setPasswordProtected(Boolean.parseBoolean(parameters.get("g_needpass")));
-		server.setMaxClients(Integer.parseInt(parameters.get("sv_maxclients")));
+		server.setMapName(this.parameters.get("mapname"));
+		server.setPasswordProtected(Boolean.parseBoolean(this.parameters.get("g_needpass")));
+		server.setMaxClients(Integer.parseInt(this.parameters.get("sv_maxclients")));
 		server.setCurrentClients(server.getPlayers().size());
 	}
 
 	private Player parsePlayer(String line) {
-		Matcher matcher = pattern.matcher(line);
+		Matcher matcher = this.pattern.matcher(line);
 
 		if (matcher.find()) {
 			int score = Integer.parseInt(matcher.group(1));
@@ -172,6 +172,6 @@ public class Quake3Protocol {
 	}
 
 	public InetAddress getIpAddress() {
-		return ipAddress;
+		return this.ipAddress;
 	}
 }
