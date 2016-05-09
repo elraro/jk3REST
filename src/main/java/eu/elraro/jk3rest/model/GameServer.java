@@ -3,11 +3,24 @@ package eu.elraro.jk3rest.model;
 import java.util.ArrayList;
 import java.util.TreeMap;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Transient;
+
 import eu.elraro.jk3rest.query.Quake3Protocol;
 import eu.elraro.jk3rest.query.ServerResponseStatus;
 
+@Entity
 public class GameServer {
+
+	@Transient
 	private Quake3Protocol protocol;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private long id;
 
 	private int currentClients, port, ping, maxClients;
 	private String ipAddress, mapName, hostName, coloredHostName;
@@ -19,8 +32,8 @@ public class GameServer {
 		this.ipAddress = ipAddress;
 		this.port = port;
 		this.protocol = protocol;
-		this.players = new ArrayList<>();
-		this.parameters = new TreeMap<>();
+		this.players = new ArrayList<Player>();
+		this.parameters = new TreeMap<String, String>();
 	}
 
 	public ServerResponseStatus connect() {

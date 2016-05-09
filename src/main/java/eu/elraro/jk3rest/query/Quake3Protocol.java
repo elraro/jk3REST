@@ -53,7 +53,7 @@ public class Quake3Protocol {
 
 		try {
 			this.socket = new DatagramSocket();
-			this.socket.setSoTimeout(timeout);
+			this.socket.setSoTimeout(this.timeout);
 		} catch (SocketException e) {
 			return this.responseStatus = ServerResponseStatus.SOCKET_EXCEPTION;
 		}
