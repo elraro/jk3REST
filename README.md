@@ -2,8 +2,12 @@
 
 API REST for query JK3 servers(based on Quake 3 protocol).
 
+## Build Status
+
+[![Build Status](https://travis-ci.org/elraro/jk3REST.svg?branch=master)
+
 ## License
 
-[![License](https://img.shields.io/github/license/elraro/jk3apirest.svg)](https://github.com/elraro/jk3apirest/blob/master/LICENSE.txt)
+[![License](https://img.shields.io/github/license/elraro/jk3REST.svg)](https://github.com/elraro/jk3REST/blob/master/LICENSE.txt)
 
-jk3apirest is licensed under GPLv2 as free software. You are free to use, modify and redistribute jk3apirest following the terms in LICENSE.txt.
+jk3REST is licensed under GPLv2 as free software. You are free to use, modify and redistribute jk3REST following the terms in LICENSE.txt.
