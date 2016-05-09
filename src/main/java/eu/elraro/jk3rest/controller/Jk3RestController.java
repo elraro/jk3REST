@@ -33,6 +33,8 @@ public class Jk3RestController {
 		GameServer server = new GameServer(ip, port, quake3Protocol);
 		ServerResponseStatus status = server.connect();
 		server.update();
+		
+		jk3RestRepository.save(server);
 
         switch(status) {
         	case OK:

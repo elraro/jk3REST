@@ -1,12 +1,18 @@
 package eu.elraro.jk3rest.model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Transient;
 
 import eu.elraro.jk3rest.query.Quake3Protocol;
@@ -14,7 +20,6 @@ import eu.elraro.jk3rest.query.ServerResponseStatus;
 
 @Entity
 public class GameServer {
-
 	@Transient
 	private Quake3Protocol protocol;
 
@@ -25,15 +30,19 @@ public class GameServer {
 	private int currentClients, port, ping, maxClients;
 	private String ipAddress, mapName, hostName, coloredHostName;
 	private boolean isOnline, isPasswordProtected;
-	private ArrayList<Player> players;
-	private TreeMap<String, String> parameters;
+	@OneToMany(cascade=CascadeType.ALL)
+	private List<Player> players;
+	@Column(length=5000)
+	private HashMap<String, String> parameters;
+	
+	public GameServer() {}
 
 	public GameServer(String ipAddress, int port, Quake3Protocol protocol) {
 		this.ipAddress = ipAddress;
 		this.port = port;
 		this.protocol = protocol;
 		this.players = new ArrayList<Player>();
-		this.parameters = new TreeMap<String, String>();
+		this.parameters = new HashMap<String, String>();
 	}
 
 	public ServerResponseStatus connect() {
@@ -70,19 +79,19 @@ public class GameServer {
 		this.isOnline = isOnline;
 	}
 
-	public ArrayList<Player> getPlayers() {
+	public List<Player> getPlayers() {
 		return this.players;
 	}
 
-	public void setPlayers(ArrayList<Player> players) {
+	public void setPlayers(List<Player> players) {
 		this.players = players;
 	}
 
-	public TreeMap<String, String> getParameters() {
+	public HashMap<String, String> getParameters() {
 		return this.parameters;
 	}
 
-	public void setParameters(TreeMap<String, String> parameters) {
+	public void setParameters(HashMap<String, String> parameters) {
 		this.parameters = parameters;
 	}
 

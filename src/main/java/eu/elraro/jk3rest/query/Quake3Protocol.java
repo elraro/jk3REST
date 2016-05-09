@@ -9,8 +9,8 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.StringTokenizer;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -26,7 +26,7 @@ public class Quake3Protocol {
 	private String ipHostName;
 	private InetAddress ipAddress;
 	private int port;
-	private TreeMap<String, String> parameters;
+	private HashMap<String, String> parameters;
 	private int timeout = 1500;
 	private ServerResponseStatus responseStatus;
 
@@ -35,7 +35,7 @@ public class Quake3Protocol {
 	private static final String PLAYER_REGEX = "(\\d+) (\\d+) \"(.*)\"";
 
 	public Quake3Protocol() {
-		this.parameters = new TreeMap<String, String>();
+		this.parameters = new HashMap<String, String>();
 		this.pattern = Pattern.compile(PLAYER_REGEX);
 	}
 
@@ -143,6 +143,7 @@ public class Quake3Protocol {
 	}
 
 	private void updateParameters(GameServer server) {
+		this.parameters.put("sv_hostname", Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
 		server.setParameters(this.parameters);
 
 		server.setOnline(true);
