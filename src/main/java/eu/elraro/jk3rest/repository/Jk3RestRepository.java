@@ -17,4 +17,6 @@ public interface Jk3RestRepository extends JpaRepository<GameServer, Long> {
 
 	@Cacheable
 	List<GameServer> findAll();
+	
+	GameServer findByIpAddressAndPort(String ipAddress, int port);
 }

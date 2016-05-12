@@ -3,8 +3,6 @@ package eu.elraro.jk3rest.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -20,9 +18,6 @@ import eu.elraro.jk3rest.query.ServerResponseStatus;
 
 @Entity
 public class GameServer {
-	@Transient
-	private Quake3Protocol protocol;
-
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
@@ -34,13 +29,15 @@ public class GameServer {
 	private List<Player> players;
 	@Column(length=5000)
 	private HashMap<String, String> parameters;
+	private long timestamp;
 	
 	public GameServer() {}
 
-	public GameServer(String ipAddress, int port, Quake3Protocol protocol) {
+	public GameServer(String ipAddress, int port, Quake3Protocol protocol, long timestamp) {
 		this.ipAddress = ipAddress;
 		this.port = port;
 		this.protocol = protocol;
+		this.timestamp = timestamp;
 		this.players = new ArrayList<Player>();
 		this.parameters = new HashMap<String, String>();
 	}
@@ -67,6 +64,7 @@ public class GameServer {
 		return this.protocol.getResponseStatus();
 	}
 
+	@Transient
 	public Quake3Protocol getProtocol() {
 		return this.protocol;
 	}
@@ -165,6 +163,14 @@ public class GameServer {
 
 	public void setCurrentClients(int currentClients) {
 		this.currentClients = currentClients;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
+	}
+
+	public void setTimestamp(long timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	@Override
