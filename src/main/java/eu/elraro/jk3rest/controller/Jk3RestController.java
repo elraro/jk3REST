@@ -33,7 +33,6 @@ public class Jk3RestController {
 		GameServer serverDatabase = jk3RestRepository.findByIpAddressAndPort(ip, port);
 		if (serverDatabase != null) {
 			if (serverDatabase.getTimestamp() + 1000 > System.currentTimeMillis()) {
-				System.out.println("asdasd");
 				return new ResponseEntity<GameServer>(serverDatabase, HttpStatus.OK);
 			} else {
 				jk3RestRepository.delete(serverDatabase);
@@ -41,9 +40,8 @@ public class Jk3RestController {
 		}
 		
 		Quake3Protocol quake3Protocol = new Quake3Protocol();
-		GameServer server = new GameServer(ip, port, quake3Protocol, System.currentTimeMillis());
-		ServerResponseStatus status = server.connect();
-		server.update();
+		GameServer server = new GameServer(ip, port, System.currentTimeMillis());
+		ServerResponseStatus status = server.connect(quake3Protocol);
 		
 		jk3RestRepository.save(server);
 

@@ -11,7 +11,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 import eu.elraro.jk3rest.query.Quake3Protocol;
 import eu.elraro.jk3rest.query.ServerResponseStatus;
@@ -33,40 +32,23 @@ public class GameServer {
 	
 	public GameServer() {}
 
-	public GameServer(String ipAddress, int port, Quake3Protocol protocol, long timestamp) {
+	public GameServer(String ipAddress, int port, long timestamp) {
 		this.ipAddress = ipAddress;
 		this.port = port;
-		this.protocol = protocol;
 		this.timestamp = timestamp;
 		this.players = new ArrayList<Player>();
 		this.parameters = new HashMap<String, String>();
 	}
 
-	public ServerResponseStatus connect() {
-		if (this.protocol.connect(this.ipAddress, this.port) == ServerResponseStatus.CONNECTED) {
-			this.ipAddress = this.protocol.getIpAddress().getHostAddress();
-		}
-
-		return this.protocol.getResponseStatus();
-	}
-
-	public void disconnect() {
-		this.isOnline = false;
-		this.protocol.disconnect();
-	}
-
-	public ServerResponseStatus update() {
-		if (this.protocol.getResponseStatus() == ServerResponseStatus.CONNECTED) {
-			if (this.protocol.query("getstatus") == ServerResponseStatus.OK) {
-				this.protocol.updateServerInfo(this);
+	public ServerResponseStatus connect(Quake3Protocol protocol) {
+		if (protocol.connect(this.ipAddress, this.port) == ServerResponseStatus.CONNECTED) {
+			this.ipAddress = protocol.getIpAddress().getHostAddress();
+			ServerResponseStatus status = protocol.query("getstatus");
+			if (status == ServerResponseStatus.OK) {
+				protocol.updateServerInfo(this);
 			}
 		}
-		return this.protocol.getResponseStatus();
-	}
-
-	@Transient
-	public Quake3Protocol getProtocol() {
-		return this.protocol;
+		return protocol.getResponseStatus();
 	}
 
 	public boolean isOnline() {
@@ -175,10 +157,9 @@ public class GameServer {
 
 	@Override
 	public String toString() {
-		return "GameServer [protocol=" + protocol + ", currentClients=" + currentClients + ", port=" + port + ", ping="
+		return "GameServer [currentClients=" + currentClients + ", port=" + port + ", ping="
 				+ ping + ", maxClients=" + maxClients + ", ipAddress=" + ipAddress + ", mapName=" + mapName
 				+ ", hostName=" + hostName + ", coloredHostName=" + coloredHostName + ", isOnline=" + isOnline
 				+ ", isPasswordProtected=" + isPasswordProtected + ", players=" + players + "]";
 	}
-
 }

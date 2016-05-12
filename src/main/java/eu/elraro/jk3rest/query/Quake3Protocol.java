@@ -9,12 +9,14 @@ import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import eu.elraro.jk3rest.model.GameServer;
+import eu.elraro.jk3rest.model.MasterServer;
 import eu.elraro.jk3rest.model.Player;
 
 public class Quake3Protocol {
@@ -22,7 +24,7 @@ public class Quake3Protocol {
 	private DatagramPacket packet = null;
 	private Pattern pattern = null;
 
-	private String response;
+	public String response;
 	private String ipHostName;
 	private InetAddress ipAddress;
 	private int port;
@@ -78,6 +80,8 @@ public class Quake3Protocol {
 				buffer[i] = tmp[i - offset];
 		}
 
+		// System.out.println(Arrays.toString(buffer));
+
 		this.packet = new DatagramPacket(buffer, buffer.length, getIpAddress(), this.port);
 		try {
 			this.time = System.currentTimeMillis();
@@ -104,6 +108,24 @@ public class Quake3Protocol {
 			this.responseStatus = ServerResponseStatus.IO_EXCEPTION;
 			return null;
 		}
+		
+//		for($i = 0; $i < strlen($returned)-10; $i++) {
+//			if($returned[$i] == "\\" && $returned[$i+7] == "\\") {
+//			$ip = ord($returned[$i+1]).".".ord($returned[$i+2]).".".ord($returned[$i+3]).".".ord($returned[$i+4]);
+//			$port = (ord($returned[$i+5])<<8) + ord($returned[$i+6]);
+//			array_push($servers, array($ip, $port));
+//			}
+//			}
+		
+		ArrayList<String> servers = new ArrayList<String>();
+		for(int i = 0; i < response.length-10; i++) {
+			if(response[i] == '\\' && response[i+7] == '\\') {
+				String ip = (int) response[i+1] + "." + (int) response[i+2] + "." + (int) response[i+3] + "." + (int) response[i+4];
+				int port = (((int) response[i+5]) << 8) + (int) response[i+6];
+				servers.add(ip + ":" + port);
+			}
+		}
+		System.out.println(servers);
 
 		return new String(response);
 	}
@@ -121,8 +143,6 @@ public class Quake3Protocol {
 		server.setPlayers(new ArrayList<Player>());
 		String[] lines = this.response.split("\\n");
 
-		//System.out.println(lines[1]);
-
 		// parameters
 		StringTokenizer tokens = new StringTokenizer(lines[1], "\\");
 		while (tokens.hasMoreTokens()) {
@@ -136,14 +156,14 @@ public class Quake3Protocol {
 			if (lines[i].length() == 0)
 				continue;
 			server.getPlayers().add(parsePlayer(lines[i]));
-			//System.out.println(server.getPlayers().get(i - 2));
 		}
 
 		updateParameters(server);
 	}
 
 	private void updateParameters(GameServer server) {
-		this.parameters.put("sv_hostname", Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
+		this.parameters.put("sv_hostname",
+				Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
 		server.setParameters(this.parameters);
 
 		server.setOnline(true);
@@ -151,8 +171,11 @@ public class Quake3Protocol {
 		server.setPort(this.port);
 		server.setPing((int) this.deltaTime);
 
-		server.setColoredHostName(Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
-		server.setHostName(Normalizer.normalize(Utilities.removeColorCode(server.getColoredHostName()), Normalizer.Form.NFC).replace("\uFFFD", ""));
+		server.setColoredHostName(
+				Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
+		server.setHostName(
+				Normalizer.normalize(Utilities.removeColorCode(server.getColoredHostName()), Normalizer.Form.NFC)
+						.replace("\uFFFD", ""));
 		server.setMapName(this.parameters.get("mapname"));
 		server.setPasswordProtected(Boolean.parseBoolean(this.parameters.get("g_needpass")));
 		server.setMaxClients(Integer.parseInt(this.parameters.get("sv_maxclients")));
@@ -166,7 +189,8 @@ public class Quake3Protocol {
 			int score = Integer.parseInt(matcher.group(1));
 			int ping = Integer.parseInt(matcher.group(2));
 			String coloredName = Normalizer.normalize(matcher.group(3), Normalizer.Form.NFD).replace("\uFFFD", "");
-			String name = Normalizer.normalize(Utilities.removeColorCode(coloredName), Normalizer.Form.NFD).replace("\uFFFD", "");
+			String name = Normalizer.normalize(Utilities.removeColorCode(coloredName), Normalizer.Form.NFD)
+					.replace("\uFFFD", "");
 			return new Player(name, coloredName, score, ping);
 		}
 		return null;
@@ -174,5 +198,10 @@ public class Quake3Protocol {
 
 	public InetAddress getIpAddress() {
 		return this.ipAddress;
+	}
+
+	public void updateServerInfo(MasterServer masterServer) {
+		// TODO Auto-generated method stub
+
 	}
 }
