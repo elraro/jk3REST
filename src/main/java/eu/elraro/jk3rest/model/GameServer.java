@@ -21,6 +21,7 @@ public class GameServer {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private long id;
 
+	private ServerResponseStatus status;
 	private int currentClients, port, ping, maxClients;
 	private String ipAddress, mapName, hostName, coloredHostName;
 	private boolean isOnline, isPasswordProtected;
@@ -153,6 +154,14 @@ public class GameServer {
 
 	public void setTimestamp(long timestamp) {
 		this.timestamp = timestamp;
+	}
+
+	public ServerResponseStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(ServerResponseStatus status) {
+		this.status = status;
 	}
 
 	@Override

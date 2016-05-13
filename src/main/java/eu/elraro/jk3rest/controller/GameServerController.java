@@ -42,22 +42,8 @@ public class GameServerController {
 		Quake3Protocol quake3Protocol = new Quake3Protocol();
 		GameServer server = new GameServer(ip, port, System.currentTimeMillis());
 		ServerResponseStatus status = server.connect(quake3Protocol);
-		
+		server.setStatus(status);
 		gameServerRepository.save(server);
-
-//        switch(status) {
-//        	case OK:
-//        	case CONNECTED:
-//                return new ResponseEntity<GameServer>(server, HttpStatus.OK);
-//        	case ILLEGAL_ARGUMENT_EXCEPTION:
-//        	case UNKNOWN_HOST_EXCEPTION:
-//        	case IO_EXCEPTION:
-//        		return new ResponseEntity<GameServer>(server, HttpStatus.BAD_REQUEST);
-//        	case SOCKET_EXCEPTION:
-//        	case SOCKET_TIMEOUT_EXCEPTION:
-//        	default:
-//        		return new ResponseEntity<GameServer>(server, HttpStatus.REQUEST_TIMEOUT);
-//        }
 
 		return new ResponseEntity<GameServer>(server, HttpStatus.OK);
 		

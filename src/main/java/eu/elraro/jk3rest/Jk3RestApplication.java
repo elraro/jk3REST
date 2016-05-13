@@ -22,6 +22,6 @@ public class Jk3RestApplication {
 	@Bean
     public CacheManager cacheManager() {
     	LOG.info("Activating cache...");
-    	return new ConcurrentMapCacheManager("servers");
+    	return new ConcurrentMapCacheManager("gameServers");
     }
 }
