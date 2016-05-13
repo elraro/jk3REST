@@ -1,12 +1,14 @@
 package eu.elraro.jk3rest.query;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 import java.text.Normalizer;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -118,16 +120,19 @@ public class Quake3Protocol {
 //			}
 		
 		ArrayList<String> servers = new ArrayList<String>();
+		
 		for(int i = 0; i < response.length-10; i++) {
 			if(response[i] == '\\' && response[i+7] == '\\') {
-				String ip = (int) response[i+1] + "." + (int) response[i+2] + "." + (int) response[i+3] + "." + (int) response[i+4];
-				int port = (((int) response[i+5]) << 8) + (int) response[i+6];
+				//System.out.println(new Integer(response[i+1]) + "." + new Integer(response[i+2]) + "." + new Integer(response[i+3]) + "." + new Integer(response[i+4]));
+				String ip = (int) (response[i+1] & 0xFF) + "." + (int) (response[i+2] & 0xFF) + "." + (int) (response[i+3] & 0xFF) + "." + (int) (response[i+4] & 0xFF);
+				int port = ((int) (response[i+5] & 0xFF)) * 256 + (int) (response[i+6] & 0xFF);
 				servers.add(ip + ":" + port);
 			}
 		}
 		System.out.println(servers);
-
-		return new String(response);
+		System.out.println(servers.size());
+		System.out.println(new String(response));
+			return new String(response, Charset.forName("UTF-8"));
 	}
 
 	public ServerResponseStatus getResponseStatus() {
