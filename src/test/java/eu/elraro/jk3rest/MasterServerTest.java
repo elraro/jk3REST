@@ -24,9 +24,9 @@ public class MasterServerTest {
 
 	@Test
 	public void queryRealMasterServer() {
-		MasterServer master = new MasterServer("master.jkhub.org", 29060); // master.jkhub.org 29060
+		MasterServer master = new MasterServer("master.jkhub.org", 29060);
 		if (master.connect(quake3Protocol) == ServerResponseStatus.OK) {
-			quake3Protocol.updateMasterInfo(master);
+			System.out.println(master.getServers());
 		}
 	}
 }

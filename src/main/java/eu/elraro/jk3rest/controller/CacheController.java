@@ -19,7 +19,7 @@ public class CacheController {
 	@RequestMapping(value = "/serversCache", method = RequestMethod.GET)
 	public Map<Object, Object> getCacheContent() {
 		ConcurrentMapCacheManager cacheMgr = (ConcurrentMapCacheManager) cacheManager;
-		ConcurrentMapCache cache = (ConcurrentMapCache) cacheMgr.getCache("servers");
+		ConcurrentMapCache cache = (ConcurrentMapCache) cacheMgr.getCache("gameServers");
 		return cache.getNativeCache();
 	}
 

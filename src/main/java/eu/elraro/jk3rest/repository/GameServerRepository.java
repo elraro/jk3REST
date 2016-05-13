@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import eu.elraro.jk3rest.model.GameServer;
 
-@CacheConfig(cacheNames="servers")
-public interface Jk3RestRepository extends JpaRepository<GameServer, Long> {
+@CacheConfig(cacheNames="gameServers")
+public interface GameServerRepository extends JpaRepository<GameServer, Long> {
 	
 	@CacheEvict(allEntries=true)
 	GameServer save(GameServer server);

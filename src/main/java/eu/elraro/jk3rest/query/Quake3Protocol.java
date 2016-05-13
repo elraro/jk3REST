@@ -24,7 +24,7 @@ public class Quake3Protocol {
 	private DatagramPacket packet = null;
 	private Pattern pattern = null;
 
-	private String response;
+	private byte[] response;
 	private String ipHostName;
 	private InetAddress ipAddress;
 	private int port;
@@ -92,7 +92,7 @@ public class Quake3Protocol {
 		return getResponseStatus();
 	}
 
-	private String getResponse() {
+	private byte[] getResponse() {
 		byte[] response = new byte[65507];
 		this.packet = new DatagramPacket(response, response.length);
 		try {
@@ -106,23 +106,8 @@ public class Quake3Protocol {
 			this.responseStatus = ServerResponseStatus.IO_EXCEPTION;
 			return null;
 		}
-		
-		ArrayList<String> servers = new ArrayList<String>();
-		for (int i = 0; i < response.length - 10; i++) {
-			if (response[i] == '\\' && response[i + 7] == '\\') {
-				// System.out.println(new Integer(response[i+1]) + "." + new
-				// Integer(response[i+2]) + "." + new Integer(response[i+3]) +
-				// "." + new Integer(response[i+4]));
-				String ip = (int) (response[i + 1] & 0xFF) + "." + (int) (response[i + 2] & 0xFF) + "."
-						+ (int) (response[i + 3] & 0xFF) + "." + (int) (response[i + 4] & 0xFF);
-				int port = ((int) (response[i + 5] & 0xFF)) * 256 + (int) (response[i + 6] & 0xFF);
-				servers.add(ip + ":" + port);
-			}
-		}
-		System.out.println(servers);
-		System.out.println(servers.size());
 
-		return new String(response, Charset.forName("UTF-8"));
+		return response;
 	}
 
 	public ServerResponseStatus getResponseStatus() {
@@ -130,13 +115,14 @@ public class Quake3Protocol {
 	}
 
 	public void updateServerInfo(GameServer server) {
-		if (this.response == null || this.response.contains("disconnect")) {
+		String response = new String(this.response, Charset.forName("UTF-8")); 
+		if (response == null || response.contains("disconnect")) {
 			server.setOnline(false);
 			return;
 		}
 
 		server.setPlayers(new ArrayList<Player>());
-		String[] lines = this.response.split("\\n");
+		String[] lines = response.split("\\n");
 
 		// parameters
 		StringTokenizer tokens = new StringTokenizer(lines[1], "\\");
@@ -196,30 +182,23 @@ public class Quake3Protocol {
 	}
 
 	public void updateMasterInfo(MasterServer masterServer) {
-		if (this.response == null || this.response.contains("disconnect")) {
+		if (this.response == null) {
 			masterServer.setOnline(false);
 			return;
 		}
 
 		ArrayList<String> servers = new ArrayList<String>();
-System.out.println(this.response);
-		byte[] response = this.response.getBytes();
+		byte[] response = this.response;
 		
 		for (int i = 0; i < response.length - 10; i++) {
 			if (response[i] == '\\' && response[i + 7] == '\\') {
-				// System.out.println(new Integer(response[i+1]) + "." + new
-				// Integer(response[i+2]) + "." + new Integer(response[i+3]) +
-				// "." + new Integer(response[i+4]));
 				String ip = (int) (response[i + 1] & 0xFF) + "." + (int) (response[i + 2] & 0xFF) + "."
 						+ (int) (response[i + 3] & 0xFF) + "." + (int) (response[i + 4] & 0xFF);
 				int port = ((int) (response[i + 5] & 0xFF)) * 256 + (int) (response[i + 6] & 0xFF);
 				servers.add(ip + ":" + port);
 			}
 		}
-		System.out.println(servers);
-		System.out.println(servers.size());
-		//System.out.println(new String(response));
-		//return new String(response, Charset.forName("UTF-8"));
-
+		
+		masterServer.setServers(servers);
 	}
 }
