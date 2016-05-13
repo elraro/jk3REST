@@ -82,8 +82,6 @@ public class Quake3Protocol {
 				buffer[i] = tmp[i - offset];
 		}
 
-		// System.out.println(Arrays.toString(buffer));
-
 		this.packet = new DatagramPacket(buffer, buffer.length, getIpAddress(), this.port);
 		try {
 			this.time = System.currentTimeMillis();
@@ -110,29 +108,8 @@ public class Quake3Protocol {
 			this.responseStatus = ServerResponseStatus.IO_EXCEPTION;
 			return null;
 		}
-		
-//		for($i = 0; $i < strlen($returned)-10; $i++) {
-//			if($returned[$i] == "\\" && $returned[$i+7] == "\\") {
-//			$ip = ord($returned[$i+1]).".".ord($returned[$i+2]).".".ord($returned[$i+3]).".".ord($returned[$i+4]);
-//			$port = (ord($returned[$i+5])<<8) + ord($returned[$i+6]);
-//			array_push($servers, array($ip, $port));
-//			}
-//			}
-		
-		ArrayList<String> servers = new ArrayList<String>();
-		
-		for(int i = 0; i < response.length-10; i++) {
-			if(response[i] == '\\' && response[i+7] == '\\') {
-				//System.out.println(new Integer(response[i+1]) + "." + new Integer(response[i+2]) + "." + new Integer(response[i+3]) + "." + new Integer(response[i+4]));
-				String ip = (int) (response[i+1] & 0xFF) + "." + (int) (response[i+2] & 0xFF) + "." + (int) (response[i+3] & 0xFF) + "." + (int) (response[i+4] & 0xFF);
-				int port = ((int) (response[i+5] & 0xFF)) * 256 + (int) (response[i+6] & 0xFF);
-				servers.add(ip + ":" + port);
-			}
-		}
-		System.out.println(servers);
-		System.out.println(servers.size());
-		System.out.println(new String(response));
-			return new String(response, Charset.forName("UTF-8"));
+
+		return new String(response, Charset.forName("UTF-8"));
 	}
 
 	public ServerResponseStatus getResponseStatus() {
@@ -205,8 +182,29 @@ public class Quake3Protocol {
 		return this.ipAddress;
 	}
 
-	public void updateServerInfo(MasterServer masterServer) {
-		// TODO Auto-generated method stub
+	public void updateMasterInfo(MasterServer masterServer) {
+		if (this.response == null || this.response.contains("disconnect")) {
+			masterServer.setOnline(false);
+			return;
+		}
+
+		ArrayList<String> servers = new ArrayList<String>();
+
+		for (int i = 0; i < response.length - 10; i++) {
+			if (response[i] == '\\' && response[i + 7] == '\\') {
+				// System.out.println(new Integer(response[i+1]) + "." + new
+				// Integer(response[i+2]) + "." + new Integer(response[i+3]) +
+				// "." + new Integer(response[i+4]));
+				String ip = (int) (response[i + 1] & 0xFF) + "." + (int) (response[i + 2] & 0xFF) + "."
+						+ (int) (response[i + 3] & 0xFF) + "." + (int) (response[i + 4] & 0xFF);
+				int port = ((int) (response[i + 5] & 0xFF)) * 256 + (int) (response[i + 6] & 0xFF);
+				servers.add(ip + ":" + port);
+			}
+		}
+		System.out.println(servers);
+		System.out.println(servers.size());
+		System.out.println(new String(response));
+		//return new String(response, Charset.forName("UTF-8"));
 
 	}
 }

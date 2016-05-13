@@ -9,6 +9,7 @@ public class MasterServer {
 
 	private int port;
 	private String ipAddress;
+	private boolean online;
 	
 	public MasterServer() {}
 
@@ -37,5 +38,13 @@ public class MasterServer {
 			}
 		}
 		return protocol.getResponseStatus();
+	}
+	
+	public boolean getOnline() {
+		return this.online;
+	}
+
+	public void setOnline(boolean online) {
+		this.online = online;
 	}
 }
