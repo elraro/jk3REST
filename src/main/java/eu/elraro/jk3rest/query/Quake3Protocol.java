@@ -143,24 +143,28 @@ public class Quake3Protocol {
 	}
 
 	private void updateParameters(GameServer server) {
-		this.parameters.put("sv_hostname",
-				Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
-		server.setParameters(this.parameters);
-
-		server.setOnline(true);
-		server.setIpAddress(getIpAddress().getHostAddress());
-		server.setPort(this.port);
-		server.setPing((int) this.deltaTime);
-
-		server.setColoredHostName(
-				Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
-		server.setHostName(
-				Normalizer.normalize(Utilities.removeColorCode(server.getColoredHostName()), Normalizer.Form.NFC)
-						.replace("\uFFFD", ""));
-		server.setMapName(this.parameters.get("mapname"));
-		server.setPasswordProtected(Boolean.parseBoolean(this.parameters.get("g_needpass")));
-		server.setMaxClients(Integer.parseInt(this.parameters.get("sv_maxclients")));
-		server.setCurrentClients(server.getPlayers().size());
+		try {
+			this.parameters.put("sv_hostname",
+					Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
+			server.setParameters(this.parameters);
+	
+			server.setOnline(true);
+			server.setIpAddress(getIpAddress().getHostAddress());
+			server.setPort(this.port);
+			server.setPing((int) this.deltaTime);
+	
+			server.setColoredHostName(
+					Normalizer.normalize(this.parameters.get("sv_hostname"), Normalizer.Form.NFD).replace("\uFFFD", ""));
+			server.setHostName(
+					Normalizer.normalize(Utilities.removeColorCode(server.getColoredHostName()), Normalizer.Form.NFC)
+							.replace("\uFFFD", ""));
+			server.setMapName(this.parameters.get("mapname"));
+			server.setPasswordProtected(Boolean.parseBoolean(this.parameters.get("g_needpass")));
+			server.setMaxClients(Integer.parseInt(this.parameters.get("sv_maxclients")));
+			server.setCurrentClients(server.getPlayers().size());
+		} catch (NullPointerException e) {
+			// sv_hostName WTF?!
+		}
 	}
 
 	private Player parsePlayer(String line) {

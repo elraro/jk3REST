@@ -18,10 +18,4 @@ public class Jk3RestApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(Jk3RestApplication.class, args);
 	}
-	
-	@Bean
-    public CacheManager cacheManager() {
-    	LOG.info("Activating cache...");
-    	return new ConcurrentMapCacheManager("gameServers");
-    }
 }
