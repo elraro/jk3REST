@@ -2,6 +2,8 @@ package eu.elraro.jk3rest.controller;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import eu.elraro.jk3rest.Jk3RestApplication;
 import eu.elraro.jk3rest.model.GameServer;
 import eu.elraro.jk3rest.model.MasterServer;
 import eu.elraro.jk3rest.query.Quake3Protocol;
@@ -17,7 +20,9 @@ import eu.elraro.jk3rest.query.ServerResponseStatus;
 import eu.elraro.jk3rest.repository.GameServerRepository;
 
 @RestController
-public class GameServerController {
+public class ServerController {
+	
+	private static final Log LOG = LogFactory.getLog(ServerController.class);
 
 	@Autowired
 	private GameServerRepository gameServerRepository;
@@ -25,6 +30,7 @@ public class GameServerController {
 	@RequestMapping(value = "/servers", method = RequestMethod.GET)
 	public ResponseEntity<List<GameServer>> getAllServers() {
 		List<GameServer> servers = gameServerRepository.findAll();
+		LOG.info("Query all servers");
         return new ResponseEntity<List<GameServer>>(servers, HttpStatus.OK);
 	}
 	
@@ -42,8 +48,10 @@ public class GameServerController {
 					gameServerRepository.save(server);
 				}
 			}
+			LOG.info("Query update from master server.");
 			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
 		}
+		LOG.error("Error when query update from master server.");
         return new ResponseEntity<Boolean>(false, HttpStatus.OK);
 	}
 
@@ -53,6 +61,7 @@ public class GameServerController {
 		GameServer server = new GameServer(ip, port, System.currentTimeMillis());
 		ServerResponseStatus status = server.connect(quake3Protocol);
 		server.setStatus(status);
+		LOG.info("Query server " + ip + ":" + port);
 
 		return new ResponseEntity<GameServer>(server, HttpStatus.OK);
 	}
