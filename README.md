@@ -1,6 +1,11 @@
 # JK3 QUERY PORT API REST
 
-API REST for query JK3 servers(based on Quake 3 protocol).
+API REST for query JK3 servers(based on Quake 3 protocol). Result is always in JSON.
+
+## Usage
+* **/servers** - Get all servers in DB
+* **/servers/update** - Update DB from master server
+* **/servers/{ip}/{port}/** - Fetch server with ip and port
 
 ## Build Status
 
