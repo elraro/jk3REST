@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import eu.elraro.jk3rest.Jk3RestApplication;
 import eu.elraro.jk3rest.model.GameServer;
 import eu.elraro.jk3rest.model.MasterServer;
 import eu.elraro.jk3rest.query.Quake3Protocol;
@@ -49,10 +48,10 @@ public class ServerController {
 				}
 			}
 			LOG.info("Query update from master server.");
-			return new ResponseEntity<Boolean>(true, HttpStatus.OK);
+			return new ResponseEntity<Boolean>(true, HttpStatus.CREATED);
 		}
 		LOG.error("Error when query update from master server.");
-        return new ResponseEntity<Boolean>(false, HttpStatus.OK);
+        return new ResponseEntity<Boolean>(false, HttpStatus.SERVICE_UNAVAILABLE);
 	}
 
 	@RequestMapping(value = "/servers/{ip}/{port}/", method = RequestMethod.GET)
@@ -62,7 +61,9 @@ public class ServerController {
 		ServerResponseStatus status = server.connect(quake3Protocol);
 		server.setStatus(status);
 		LOG.info("Query server " + ip + ":" + port);
-
+		if (server.getStatus() != ServerResponseStatus.OK) {
+			return new ResponseEntity<GameServer>(server, HttpStatus.BAD_REQUEST);
+		}
 		return new ResponseEntity<GameServer>(server, HttpStatus.OK);
 	}
 

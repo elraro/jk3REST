@@ -1,5 +1,7 @@
 package eu.elraro.jk3rest;
 
+import static org.junit.Assert.assertTrue;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,7 +28,9 @@ public class MasterServerTest {
 	public void queryRealMasterServer() {
 		MasterServer master = new MasterServer("master.jkhub.org", 29060);
 		if (master.connect(quake3Protocol) == ServerResponseStatus.OK) {
-			System.out.println(master.getServers());
+			assertTrue(true);
+		} else {
+			assertTrue(false);
 		}
 	}
 }

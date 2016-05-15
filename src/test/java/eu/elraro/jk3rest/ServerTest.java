@@ -1,6 +1,7 @@
 package eu.elraro.jk3rest;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,10 +28,15 @@ public class ServerTest {
 
 	@Test
 	public void queryRealServer() {
-		server = new GameServer("192.223.29.244", 29070, System.currentTimeMillis());
+		server = new GameServer("89.36.214.51", 29070, System.currentTimeMillis());
 		server.connect(quake3Protocol);
 		if (quake3Protocol.query("getstatus") == ServerResponseStatus.OK) {
 			quake3Protocol.updateServerInfo(server);
+			if (!server.getHostName().contains("JK|NG")) {
+				assertTrue(false);
+			}
+		} else {
+			assertTrue(false);
 		}
 	}
 
